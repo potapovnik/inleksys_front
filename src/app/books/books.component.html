@@ -1,0 +1,37 @@
+<p>
+  books
+</p>
+<button mat-raised-button="" (click)="openDialogForCreateBook()">new book</button>
+<div class="DivTable">
+  <table matSort (matSortChange)="sortData($event)">
+  <tr>
+    <th mat-sort-header="id">ISBN</th>
+    <th mat-sort-header="author"> author</th>
+    <th mat-sort-header="tittle"> tittle</th>
+    <th mat-sort-header="delete"> delete book</th>
+    <th mat-sort-header="owner"> owner</th>
+  </tr>
+  <tr *ngFor="let book of sortedBook">
+    <td><a [routerLink]="" (click)="openDialogForUpdateBook(book)" >{{book.id}}</a></td>
+    <td>{{book.author}}</td>
+    <td>{{book.title}}</td>
+    <td>
+      <button mat-raised-button (click)="openDialogForDeleteBook(book.id)">Delete</button>
+    </td>
+    <td>
+      <div *ngIf="currentUser.id == book.reader_id; then current else other"></div>
+      <ng-template #current>
+        <button mat-raised-button (click)="returnBook(book)">return</button>
+      </ng-template>
+      <ng-template #other>
+        <button mat-raised-button *ngIf="book.reader_id == 0" (click)="takeBook(book)">take  </button>
+      </ng-template>
+      <div *ngIf="currentUser.id != book.reader_id">{{book.login}}</div>
+    </td>
+
+
+  </tr>
+</table>
+
+  <button mat-raised-button (click)="showMore()" class="showMore">Show more books</button>
+</div>

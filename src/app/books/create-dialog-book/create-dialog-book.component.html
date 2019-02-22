@@ -1,0 +1,17 @@
+<h1 mat-dialog-title></h1>
+<div mat-dialog-content>
+  <mat-error>{{error}}</mat-error>
+  <mat-form-field *ngIf="data.flag != true">
+    <input matInput required [(ngModel)]="book.id" placeholder="Enter unique ISBN">
+  </mat-form-field>
+  <mat-form-field>
+    <input matInput required [(ngModel)]="book.author" placeholder="Enter author">
+  </mat-form-field>
+  <mat-form-field>
+    <input matInput required [(ngModel)]="book.title" placeholder="Enter tittle">
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">No Thanks</button>
+  <button mat-button (click)="onYesClick()">Yes</button>
+</div>

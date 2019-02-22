@@ -1,0 +1,14 @@
+<p>
+  users works!
+</p>
+<button mat-raised-button (click)="openDialogCreate()">Create user</button>
+<table matSort (matSortChange)="sortData($event)">
+  <tr>
+    <th mat-sort-header="login">Name</th>
+    <th>Delete</th>
+  </tr>
+  <tr *ngFor="let user of sortedUser">
+    <td><a [routerLink]="" (click)="openDialogUpdate(user)">{{user.login}}</a></td>
+    <button mat-raised-button (click)="openDialogForDeleteUser(user.id)">Delete</button>
+  </tr>
+</table>
