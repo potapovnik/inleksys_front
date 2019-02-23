@@ -1,15 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import {MatDialog, Sort} from '@angular/material';
+import {Component, OnInit} from '@angular/core';
+import {MatDialog, MatSortable, Sort} from '@angular/material';
 import {DeleteDialogComponent} from './delete-dialog/delete-dialog.component';
 import {BookService} from './book.service';
 import {Book} from './book';
 import {Reader} from '../reader/reader';
 import {CreateDialogBookComponent} from './create-dialog-book/create-dialog-book.component';
+
 export interface DialogData {
   book: Book;
   id: number;
   flag: boolean;
 }
+
 @Component({
   selector: 'app-books',
   templateUrl: './books.component.html',
@@ -22,11 +24,14 @@ export class BooksComponent implements OnInit {
   currentUser: Reader;
   showMoreCount = 5;
 
+
   constructor(public dialog: MatDialog, private bookservice: BookService) {
   }
+
   ngOnInit() {
     this.bookservice.getAllBooksWithName().subscribe(books => {
       this.books = books;
+      this.sortData(<Sort>({active: 'author', direction: 'asc'}));
     });
     this.getCurrentUser();
   }
@@ -36,39 +41,53 @@ export class BooksComponent implements OnInit {
       width: '250px',
       data: {id: id}
     });
-
-    dialogRef.afterClosed().subscribe(result => {
-    });
+    dialogRef.afterClosed().subscribe(result => this.bookservice.getAllBooksWithName().subscribe(r => {
+      this.books = r;
+      this.sortData(<Sort>({active: 'author', direction: 'asc'}));
+    }));
   }
+
   openDialogForCreateBook(): void {
     const dialogRef = this.dialog.open(CreateDialogBookComponent, {
       width: '250px',
       data: {flag: false}
     });
-
-    dialogRef.afterClosed().subscribe(result => {
-    });
+    dialogRef.afterClosed().subscribe(result => this.bookservice.getAllBooksWithName().subscribe(r => {
+      this.books = r;
+      this.sortData(<Sort>({active: 'author', direction: 'asc'}));
+    }));
   }
+
   openDialogForUpdateBook(book: Book): void {
     const dialogRef = this.dialog.open(CreateDialogBookComponent, {
       width: '250px',
       data: {book: book, flag: true}
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-    });
+    dialogRef.afterClosed().subscribe(result => this.bookservice.getAllBooksWithName().subscribe(r => {
+      this.books = r;
+      this.sortData(<Sort>({active: 'author', direction: 'asc'}));
+    }));
   }
 
   takeBook(book: Book) {
     book.reader_id = this.currentUser.id;
     book.login = this.currentUser.login;
-    this.bookservice.updateBook(book).subscribe(res => this.bookservice.getAllBooksWithName().subscribe());
+    this.bookservice.updateBook(book).subscribe(res => {
+      this.bookservice.getAllBooksWithName().subscribe(r => this.books = r);
+      this.sortData(<Sort>({active: 'author', direction: 'asc'}));
+    });
   }
+
   returnBook(book: Book) {
     book.reader_id = null;
     book.login = null;
-    this.bookservice.updateBook(book).subscribe(res => this.bookservice.getAllBooksWithName().subscribe());
+    this.bookservice.updateBook(book).subscribe(res => {
+      this.bookservice.getAllBooksWithName().subscribe(r => this.books = r);
+      this.sortData(<Sort>({active: 'author', direction: 'asc'}));
+    });
   }
+
   getCurrentUser() {
     this.bookservice.getCurrentUser().subscribe(currentUs => {
       this.currentUser = currentUs;
@@ -77,7 +96,9 @@ export class BooksComponent implements OnInit {
 
   showMore() {
     this.showMoreCount += 5;
+    this.sortData(<Sort>({active: 'author', direction: 'asc'}));
   }
+
   sortData(sort: Sort) {
     this.sortedBook = this.books.slice();
     const data = this.books.slice(0, this.showMoreCount);
@@ -100,6 +121,7 @@ export class BooksComponent implements OnInit {
     });
   }
 }
+
 function compare(a: number | string, b: number | string, isAsc: boolean) {
   return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
 }

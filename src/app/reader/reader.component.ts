@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Reader} from './reader';
 import {MatDialog, Sort} from '@angular/material';
 import {ReaderService} from './reader.service';
@@ -11,6 +11,7 @@ export interface DialogData {
   id: number;
   flag: boolean;
 }
+
 @Component({
   selector: 'app-reader',
   templateUrl: './reader.component.html',
@@ -22,12 +23,14 @@ export class ReaderComponent implements OnInit {
   currentUser: Reader;
   flag: boolean;
   nullreader: Reader = new Reader();
+
   constructor(private userservice: ReaderService, public dialog: MatDialog) {
   }
 
   ngOnInit() {
     this.userservice.getAllUsers().subscribe(users => {
       this.users = users;
+      this.sortData(<Sort>({active: 'id', direction: 'asc'}));
     });
     this.getCurrentUser();
   }
@@ -41,8 +44,9 @@ export class ReaderComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       this.userservice.getAllUsers().subscribe(users => {
-        this.users = users;
+        this.sortedUser = users;
       });
+      this.sortData(<Sort>({active: 'id', direction: 'asc'}));
     });
   }
 
@@ -55,10 +59,12 @@ export class ReaderComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       this.userservice.getAllUsers().subscribe(users => {
-        this.users = users;
+        this.sortedUser = users;
       });
+      this.sortData(<Sort>({active: 'id', direction: 'asc'}));
     });
   }
+
   openDialogForDeleteUser(id: number): void {
     const dialogRef = this.dialog.open(DeleteDialogReaderComponent, {
       width: '250px',
@@ -66,6 +72,8 @@ export class ReaderComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
+      this.userservice.getAllUsers().subscribe(users => this.sortedUser = users);
+      this.sortData(<Sort>({active: 'id', direction: 'asc'}));
     });
   }
 
@@ -89,7 +97,8 @@ export class ReaderComponent implements OnInit {
 
   getCurrentUser() {
     this.userservice.getCurrentUser().subscribe(currentUs => {
-      this.currentUser = currentUs; });
+      this.currentUser = currentUs;
+    });
   }
 }
 
